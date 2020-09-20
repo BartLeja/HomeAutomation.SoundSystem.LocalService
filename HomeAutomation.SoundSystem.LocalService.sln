@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAutomation.SoundSystem.LocalService", "HomeAutomation.SoundSystem.LocalService\HomeAutomation.SoundSystem.LocalService.csproj", "{982B4ED9-FF64-4E84-AFD5-F25D7B62193B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAutomation.SoundSystem.LocalService.OnkyoApi", "HomeAutomation.SoundSystem.LocalService.OnkyoRemoteControllerApi\HomeAutomation.SoundSystem.LocalService.OnkyoApi.csproj", "{0BDE9F81-93D0-46E5-9F17-CFC48CCC6FD0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{982B4ED9-FF64-4E84-AFD5-F25D7B62193B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{982B4ED9-FF64-4E84-AFD5-F25D7B62193B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{982B4ED9-FF64-4E84-AFD5-F25D7B62193B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{982B4ED9-FF64-4E84-AFD5-F25D7B62193B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BDE9F81-93D0-46E5-9F17-CFC48CCC6FD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BDE9F81-93D0-46E5-9F17-CFC48CCC6FD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BDE9F81-93D0-46E5-9F17-CFC48CCC6FD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BDE9F81-93D0-46E5-9F17-CFC48CCC6FD0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4F74D61A-F7A2-4E08-B09C-6919DB969855}
+	EndGlobalSection
+EndGlobal
