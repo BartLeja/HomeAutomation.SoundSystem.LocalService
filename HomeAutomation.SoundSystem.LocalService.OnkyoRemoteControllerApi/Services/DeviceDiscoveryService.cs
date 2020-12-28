@@ -19,7 +19,8 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
 
         public DeviceDiscoveryService(
             IAddressResolutionProtocolService addressResolutionProtocolService,
-            IPacketService packetService)
+            IPacketService packetService
+            )
         {
             _addressResolutionProtocolService = addressResolutionProtocolService;
             _packetService = packetService;
@@ -31,7 +32,7 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
             var ret = new DiscoveryResult();
             _localEndPoint = new IPEndPoint(IPAddress.Any, 0);
             _client = new UdpClient(port);
-
+            
             //var p = new ISCPPacket("!xECNQSTN");
             _packetService.SetCommand("!xECNQSTN");
             byte[] sendbuf = _packetService.GetBytes();
@@ -39,21 +40,21 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
             {
                 try
                 {
-                    _client.Send(sendbuf, sendbuf.Length, IPAddress.Parse(networkaddress).ToString(), port);
-                    _client.Send(sendbuf, sendbuf.Length, IPAddress.Parse(networkaddress).ToString(), port);
-                    _client.Send(sendbuf, sendbuf.Length, IPAddress.Parse(networkaddress).ToString(), port);
+                    _client.SendAsync(sendbuf, sendbuf.Length, IPAddress.Parse(networkaddress).ToString(), port);
+                     _client.SendAsync(sendbuf, sendbuf.Length, IPAddress.Parse(networkaddress).ToString(), port);
+                     _client.SendAsync(sendbuf, sendbuf.Length, IPAddress.Parse(networkaddress).ToString(), port);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
 
-
+                    Console.WriteLine(e);
                 }
 
             }
             while (_client.Available > 0)
             {
                 byte[] recv = _client.Receive(ref _localEndPoint);
-                Thread.Sleep(100);
+                Thread.Sleep(300);
                 var sb = new StringBuilder();
                 foreach (byte t in recv)
                     sb.Append(char.ConvertFromUtf32(Convert.ToInt32(string.Format("{0:x2}", t), 16)));

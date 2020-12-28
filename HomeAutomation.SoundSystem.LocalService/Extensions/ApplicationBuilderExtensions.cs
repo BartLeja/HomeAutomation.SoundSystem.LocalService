@@ -27,10 +27,12 @@ namespace HomeAutomation.SoundSystem.LocalService.Extensions
 
         public static async Task RunSoundSystemAsync(
           this IApplicationBuilder applicationBuilder,
-            ISoundControllerApi soundControllerApi
+            ISoundControllerApi soundControllerApi,
+             IConfiguration configuration
             )
         {
-            soundControllerApi.StartSoundApi();
+            var onkyoUrl = configuration.GetSection("OnkyoUrl").Value;
+            soundControllerApi.StartSoundApi(onkyoUrl);
         }
     }
 }

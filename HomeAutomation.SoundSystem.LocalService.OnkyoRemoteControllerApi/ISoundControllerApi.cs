@@ -2,7 +2,7 @@
 {
     public interface ISoundControllerApi
     {
-        void StartSoundApi();
+        void StartSoundApi(string onkyoUrl);
         void MasterVolumeUp();
         void MasterVolumeDown();
         void PowerOn();

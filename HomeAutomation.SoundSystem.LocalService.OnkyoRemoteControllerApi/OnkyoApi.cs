@@ -5,6 +5,7 @@ using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 
+
 namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
 {
 
@@ -23,16 +24,17 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
         public OnkyoApi(
             ISocketService socketService, 
             IDeviceDiscoveryService deviceDiscoveryService,
-            IPacketService packetService)
+            IPacketService packetService
+           )
         {
             _socketService = socketService;
             _deviceDiscoveryService = deviceDiscoveryService;
             _packetService = packetService;
         }
 
-        public void StartSoundApi()
+        public void StartSoundApi(string onkyoUrl)
         {
-            connect();
+            connect(onkyoUrl);
         }
 
         public void MasterVolumeUp()
@@ -60,7 +62,7 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
           _socketService.SendPacket(new MasterVolumeCommand().Status);
         }
 
-        private bool connect()
+        private bool connect(string onkyoUrl)
         {
             //Auto-discovery, or get IP by input
           
@@ -72,12 +74,14 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
             {
                 Console.WriteLine("Finding reciever... failed.");
                 Console.WriteLine("Please input IP of reciever: ");
-        
-                discovery.IP = "http://192.168.1.147";
-                discovery.MAC = "N/A";
+                deviceip = onkyoUrl;
+                discovery.IP = onkyoUrl;
+                discovery.MAC = "00:09:B0:91:41:3D";
                 discovery.Model = "N/A";
                 discovery.Port = 60128;
                 discovery.Region = "N/A";
+                
+               // deviceip = discovery.IP;
             }
             else
             {
@@ -87,13 +91,13 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
 
             //Check if host is alive
             var p = new Ping();
-            PingReply rep = p.Send(deviceip, 3000);
+            PingReply rep = p.Send(deviceip, 36000);
             while (rep != null && rep.Status != IPStatus.Success)
             {
                 Console.WriteLine(string.Format(
                   "Cannot connect to Onkyo reciever ({0}). Sleeping 30sec", rep.Status));
                 Thread.Sleep(30000);
-                p.Send(deviceip, 3000);
+                p.Send(deviceip, 36000);
             }
 
             //Setup sockets to reciever

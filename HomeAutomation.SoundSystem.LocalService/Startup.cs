@@ -1,19 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using HomeAutomation.SoundSystem.LocalService.OnkyoApi;
 using HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using HomeAutomation.SoundSystem.LocalService.Clients;
-using Microsoft.Extensions.Options;
 using HomeAutomation.SoundSystem.LocalService.Extensions;
 
 namespace HomeAutomation.SoundSystem.LocalService
@@ -32,6 +24,7 @@ namespace HomeAutomation.SoundSystem.LocalService
         {
             services.AddControllers();
             services.Configure<Configuration.Configuration>(_configuration.GetSection("Configuration"));
+            services.Configure<Configuration.Configuration>(_configuration.GetSection("OnkyoUrl"));
             services.AddSingleton<IAddressResolutionProtocolService, AddressResolutionProtocolService>();
             services.AddSingleton<IDeviceDiscoveryService, DeviceDiscoveryService>();
             services.AddSingleton<IPacketService, PacketService>();
@@ -66,7 +59,7 @@ namespace HomeAutomation.SoundSystem.LocalService
 
             await app.RunSignalRClientAsync(_configuration, signalRClient);
 
-            await app.RunSoundSystemAsync(soundControllerApi);
+            await app.RunSoundSystemAsync(soundControllerApi, _configuration);
         }
     }
 }

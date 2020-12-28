@@ -54,7 +54,8 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Commands
             get { return new MasterVolumeCommand(B + "QSTN","Status"); }
         }
 
-        private int lvl { get; set; }
+        //TODO make it geter
+        public int lvl { get; set; }
 
 
         public MasterVolumeCommand SetLvl(int lvl)
@@ -62,7 +63,7 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Commands
             if (lvl >= 0 && lvl <= 80)
             {
                 var status = Status;
-                return new MasterVolumeCommand("!1MVL" + string.Format("{0:X2}", lvl), Name);
+                return new MasterVolumeCommand("!1MVL" + string.Format("{0:X2}", lvl), "SetLevel");
             }
                
             throw new ArgumentException("Volume-range 0-80 (0x00-0x50 in hex)");
