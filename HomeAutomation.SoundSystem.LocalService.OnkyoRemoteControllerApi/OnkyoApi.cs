@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
 {
-
     public delegate Task PacketRecievedApi(ICommand command);
 
     public class OnkyoApi : ISoundControllerApi
@@ -23,47 +22,37 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
         public OnkyoApi(
             ISocketService socketService, 
             IDeviceDiscoveryService deviceDiscoveryService,
-            IPacketService packetService)
+            IPacketService packetService
+           )
         {
             _socketService = socketService;
             _deviceDiscoveryService = deviceDiscoveryService;
             _packetService = packetService;
         }
 
-        public void StartSoundApi()
+        public void StartSoundApi(string onkyoUrl)
         {
-            connect();
+            connect(onkyoUrl);
         }
 
         public void MasterVolumeUp()
-        {
-            _socketService.SendPacket(new MasterVolumeCommand().Up);
-        }
-
+            =>_socketService.SendPacket(CommandGenerator.MasterVolumeCommandGenerator(MasterVolumeCommandEnum.Up));
+        
         public void MasterVolumeDown()
-        {
-            _socketService.SendPacket(new MasterVolumeCommand().Down);
-        }
-
-        public void PowerOn()
-        {
-            _socketService.SendPacket(new PowerCommand().On);
-        }
-
-        public void PowerOff()
-        {
-            _socketService.SendPacket(new PowerCommand().Off);
-        }
+            => _socketService.SendPacket(CommandGenerator.MasterVolumeCommandGenerator(MasterVolumeCommandEnum.Down));
 
         public void MasterVolumeStatus()
-        {
-          _socketService.SendPacket(new MasterVolumeCommand().Status);
-        }
+           => _socketService.SendPacket(CommandGenerator.MasterVolumeCommandGenerator(MasterVolumeCommandEnum.Status));
 
-        private bool connect()
+        public void PowerOn() 
+            => _socketService.SendPacket(CommandGenerator.PowerCommandGenerator(PowerCommandEnum.On));
+       
+        public void PowerOff()
+            => _socketService.SendPacket(CommandGenerator.PowerCommandGenerator(PowerCommandEnum.Standby));
+
+        private bool connect(string onkyoUrl)
         {
             //Auto-discovery, or get IP by input
-          
             Console.WriteLine("Finding reciever...");
             //var discovery = ISCPDeviceDiscovery.DiscoverDevice("172.16.40.255", 60128);
             var discovery = _deviceDiscoveryService.DiscoverDevice(60128);
@@ -72,12 +61,14 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
             {
                 Console.WriteLine("Finding reciever... failed.");
                 Console.WriteLine("Please input IP of reciever: ");
-        
-                discovery.IP = "http://192.168.1.147";
-                discovery.MAC = "N/A";
+                deviceip = onkyoUrl;
+                discovery.IP = onkyoUrl;
+                discovery.MAC = "00:09:B0:91:41:3D";
                 discovery.Model = "N/A";
                 discovery.Port = 60128;
                 discovery.Region = "N/A";
+                
+               // deviceip = discovery.IP;
             }
             else
             {
@@ -87,13 +78,13 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
 
             //Check if host is alive
             var p = new Ping();
-            PingReply rep = p.Send(deviceip, 3000);
+            PingReply rep = p.Send(deviceip, 36000);
             while (rep != null && rep.Status != IPStatus.Success)
             {
                 Console.WriteLine(string.Format(
                   "Cannot connect to Onkyo reciever ({0}). Sleeping 30sec", rep.Status));
                 Thread.Sleep(30000);
-                p.Send(deviceip, 3000);
+                p.Send(deviceip, 36000);
             }
 
             //Setup sockets to reciever

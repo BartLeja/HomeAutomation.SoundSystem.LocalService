@@ -101,33 +101,17 @@ namespace HomeAutomation.SoundSystem.LocalService.Clients
            {
                await InvokeSendPowerOffMethod();
            }
-           if (command.Name == "VolumeUp")
+           if (command.Name == "SetLevel")
            {
-               await InvokeSendMasterVolumeUpMethod();
-           }
-           if (command.Name == "VolumeDown")
-           {
-               await InvokeSendMasterVolumeDownMethod();
+               await InvokeChangeVolumeMethod((command as MasterVolumeCommand).lvl);
            }
         }
 
-        public async Task InvokeSendMasterVolumeUpMethod()
+        public async Task InvokeChangeVolumeMethod(int level)
         {
             try
             {
-                await _connection.InvokeAsync("SendMasterVolumeUp");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-        }
-
-        public async Task InvokeSendMasterVolumeDownMethod()
-        {
-            try
-            {
-                await _connection.InvokeAsync("SendMasterVolumeDown");
+                await _connection.InvokeAsync("SendChangeVolume", level);
             }
             catch (Exception ex)
             {
