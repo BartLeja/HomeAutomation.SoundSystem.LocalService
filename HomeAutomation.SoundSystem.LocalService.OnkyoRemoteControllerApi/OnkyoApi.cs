@@ -5,10 +5,8 @@ using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 
-
 namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
 {
-
     public delegate Task PacketRecievedApi(ICommand command);
 
     public class OnkyoApi : ISoundControllerApi
@@ -38,34 +36,23 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
         }
 
         public void MasterVolumeUp()
-        {
-            _socketService.SendPacket(new MasterVolumeCommand().Up);
-        }
-
+            =>_socketService.SendPacket(CommandGenerator.MasterVolumeCommandGenerator(MasterVolumeCommandEnum.Up));
+        
         public void MasterVolumeDown()
-        {
-            _socketService.SendPacket(new MasterVolumeCommand().Down);
-        }
-
-        public void PowerOn()
-        {
-            _socketService.SendPacket(new PowerCommand().On);
-        }
-
-        public void PowerOff()
-        {
-            _socketService.SendPacket(new PowerCommand().Off);
-        }
+            => _socketService.SendPacket(CommandGenerator.MasterVolumeCommandGenerator(MasterVolumeCommandEnum.Down));
 
         public void MasterVolumeStatus()
-        {
-          _socketService.SendPacket(new MasterVolumeCommand().Status);
-        }
+           => _socketService.SendPacket(CommandGenerator.MasterVolumeCommandGenerator(MasterVolumeCommandEnum.Status));
+
+        public void PowerOn() 
+            => _socketService.SendPacket(CommandGenerator.PowerCommandGenerator(PowerCommandEnum.On));
+       
+        public void PowerOff()
+            => _socketService.SendPacket(CommandGenerator.PowerCommandGenerator(PowerCommandEnum.Standby));
 
         private bool connect(string onkyoUrl)
         {
             //Auto-discovery, or get IP by input
-          
             Console.WriteLine("Finding reciever...");
             //var discovery = ISCPDeviceDiscovery.DiscoverDevice("172.16.40.255", 60128);
             var discovery = _deviceDiscoveryService.DiscoverDevice(60128);

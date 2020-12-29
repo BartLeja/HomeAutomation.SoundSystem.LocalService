@@ -1,14 +1,12 @@
-﻿using System;
-
-namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Commands
+﻿namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Commands
 {
+    /*"PWR" - System Power Command  	
+    "00"	sets System Standby
+    "01"	sets System On
+    "QSTN"	gets the System Power Status
+    */
     public class PowerCommand : Command<PowerCommand>, ICommand
     {
-        /*"PWR" - System Power Command  	
-      "00"	sets System Standby
-      "01"	sets System On
-      "QSTN"	gets the System Power Status
-      */
         public string Command { get; set; }
         public string Name { get; set; }
 
@@ -18,51 +16,21 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Commands
             Name = name;
         }
 
-        public PowerCommand()
-        {
-        }
-
-        public PowerCommand On
-        {
-            get { return new PowerCommand("!1PWR01", "On"); }
-        }
-
-        public PowerCommand Off
-        {
-            get { return new PowerCommand("!1PWR00", "Standby"); }
-        }
-
-        public PowerCommand Status
-        {
-            get { return new PowerCommand("!1PWRQSTN", "Status"); }
-        }
-
-        public event EventHandler CanExecuteChanged;
+        public PowerCommand(){}
 
         public override PowerCommand ParsePacket(string command)
         {
-            switch (command)
+            return command switch
             {
-                case "00":
-                    return Off;
-                case "01":
-                    return On;
-                case "QSTN":
-                    return Status;
-            }
-            throw new ArgumentException("Cannot find the command", "command");
+                "00" => new PowerCommand("!1PWR00", "Standby"),
+                "01" => new PowerCommand("!1PWR01", "On"),
+                "QSTN" => new PowerCommand("!1PWRQSTN", "Status"),
+                _ => new PowerCommand()
+            };
         }
 
-        public byte[] GetBytes()
-        {
-            return base.GetBytes(Command);
-        }
-
-        public override string ToString()
-        {
-            return string.Format("System power is {0}", Name);
-        }
-
-      
+        public byte[] GetBytes() => base.GetBytes(Command);
+       
+        public override string ToString() => string.Format("System power is {0}", Name);
     }
 }
