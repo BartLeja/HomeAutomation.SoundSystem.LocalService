@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\HomeAutomation.Core\HomeAutomation.Core.csproj" />
     <ProjectReference Include="..\HomeAutomation.SoundSystem.LocalService.OnkyoRemoteControllerApi\HomeAutomation.SoundSystem.LocalService.OnkyoApi.csproj" />
   </ItemGroup>
 

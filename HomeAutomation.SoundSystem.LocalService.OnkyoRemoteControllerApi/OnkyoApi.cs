@@ -1,4 +1,5 @@
-﻿using HomeAutomation.SoundSystem.LocalService.OnkyoApi.Commands;
+﻿using HomeAutomation.Core.Logger;
+using HomeAutomation.SoundSystem.LocalService.OnkyoApi.Commands;
 using HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services;
 using System;
 using System.Net.NetworkInformation;
@@ -35,9 +36,8 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
             connect(onkyoUrl);
         }
 
-        public void MasterVolumeUp()
-            =>_socketService.SendPacket(CommandGenerator.MasterVolumeCommandGenerator(MasterVolumeCommandEnum.Up));
-        
+        public async Task MasterVolumeUp() => _socketService.SendPacket(CommandGenerator.MasterVolumeCommandGenerator(MasterVolumeCommandEnum.Up));
+      
         public void MasterVolumeDown()
             => _socketService.SendPacket(CommandGenerator.MasterVolumeCommandGenerator(MasterVolumeCommandEnum.Down));
 

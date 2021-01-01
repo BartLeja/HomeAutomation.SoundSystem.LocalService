@@ -1,10 +1,9 @@
-﻿using HomeAutomation.SoundSystem.LocalService.OnkyoApi;
+﻿using HomeAutomation.Core.Logger;
+using HomeAutomation.SoundSystem.LocalService.OnkyoApi;
 using HomeAutomation.SoundSystem.LocalService.OnkyoApi.Commands;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace HomeAutomation.SoundSystem.LocalService.Clients
@@ -13,11 +12,17 @@ namespace HomeAutomation.SoundSystem.LocalService.Clients
     {
         private HubConnection _connection;
         private ISoundControllerApi _onkyoApi;
+        private ITelegramLogger _logger;
+        private ILokiLogger _lokiLogger;
         private int _currentVolume;
 
-        public SignalRClient(ISoundControllerApi onkyoApi)
+        public SignalRClient(ISoundControllerApi onkyoApi, 
+            ITelegramLogger logger,
+            ILokiLogger lokiLogger)
         {
             _onkyoApi = onkyoApi;
+            _logger = logger;
+            _lokiLogger = lokiLogger;
         }
 
         public async Task ConnectToSignalR(string token, string signalRHubUrl)
@@ -35,8 +40,9 @@ namespace HomeAutomation.SoundSystem.LocalService.Clients
             _connection.Closed += async (error) =>
             {
                 var connectionState = false;
+                await _logger.SendMessage("Sound System SignalR Disconnected");
                 while (!connectionState)
-                {
+                {                    
                     await Task.Delay(new Random().Next(0, 5) * 1000);
                     try
                     {
@@ -45,6 +51,7 @@ namespace HomeAutomation.SoundSystem.LocalService.Clients
                     }
                     catch (Exception ex)
                     {
+                        await _lokiLogger.SendMessage($"Sound System {ex}",LogLevel.Error);
                         connectionState = false;
                         Console.WriteLine(ex);
                     }
@@ -58,23 +65,27 @@ namespace HomeAutomation.SoundSystem.LocalService.Clients
                 // _logger.Log($"Message from {user} recived. {message}", typeof(SignalRClient).Namespace, "");
             });
 
-            _connection.On("MasterVolumeUp", () =>
+            _connection.On("MasterVolumeUp", async () =>
             {
-                _onkyoApi.MasterVolumeUp();
+                await _lokiLogger.SendMessage($"Sound System MasterVolumeUp");
+                await _onkyoApi.MasterVolumeUp();
             });
 
-            _connection.On("MasterVolumeDown", () =>
+            _connection.On("MasterVolumeDown", async () =>
             {
+                await _lokiLogger.SendMessage($"Sound System MasterVolumeDown");
                 _onkyoApi.MasterVolumeDown();
             });
 
-            _connection.On("PowerOff", () =>
+            _connection.On("PowerOff", async () =>
             {
+                await _lokiLogger.SendMessage($"Sound System PowerOff");
                 _onkyoApi.PowerOff();
             });
 
-            _connection.On("PowerOn", () =>
+            _connection.On("PowerOn", async () =>
             {
+                await _lokiLogger.SendMessage($"Sound System PowerOn");
                 _onkyoApi.PowerOn();
             });
 
@@ -86,6 +97,7 @@ namespace HomeAutomation.SoundSystem.LocalService.Clients
             }
             catch (Exception ex)
             {
+                await _lokiLogger.SendMessage($"Sound System {ex}", LogLevel.Error);
                 Console.WriteLine(ex);
             }
         }
@@ -115,6 +127,7 @@ namespace HomeAutomation.SoundSystem.LocalService.Clients
             }
             catch (Exception ex)
             {
+                await _lokiLogger.SendMessage($"Sound System {ex}", LogLevel.Error);
                 Console.WriteLine(ex);
             }
         }
@@ -127,6 +140,7 @@ namespace HomeAutomation.SoundSystem.LocalService.Clients
             }
             catch (Exception ex)
             {
+                await _lokiLogger.SendMessage($"Sound System {ex}", LogLevel.Error);
                 Console.WriteLine(ex);
             }
         }
@@ -136,9 +150,11 @@ namespace HomeAutomation.SoundSystem.LocalService.Clients
             try
             {
                 await _connection.InvokeAsync("SendPowerOn");
+
             }
             catch (Exception ex)
             {
+                await _lokiLogger.SendMessage($"Sound System {ex}", LogLevel.Error);
                 Console.WriteLine(ex);
             }
         }

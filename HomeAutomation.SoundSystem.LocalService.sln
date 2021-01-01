@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAutomation.SoundSystem.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAutomation.SoundSystem.LocalService.OnkyoApi", "HomeAutomation.SoundSystem.LocalService.OnkyoRemoteControllerApi\HomeAutomation.SoundSystem.LocalService.OnkyoApi.csproj", "{0BDE9F81-93D0-46E5-9F17-CFC48CCC6FD0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HomeAutomation.Core", "..\HomeAutomation.Core\HomeAutomation.Core.csproj", "{44F39621-AFC3-42ED-A5ED-220F071AB95B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{0BDE9F81-93D0-46E5-9F17-CFC48CCC6FD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BDE9F81-93D0-46E5-9F17-CFC48CCC6FD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BDE9F81-93D0-46E5-9F17-CFC48CCC6FD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44F39621-AFC3-42ED-A5ED-220F071AB95B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44F39621-AFC3-42ED-A5ED-220F071AB95B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44F39621-AFC3-42ED-A5ED-220F071AB95B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44F39621-AFC3-42ED-A5ED-220F071AB95B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

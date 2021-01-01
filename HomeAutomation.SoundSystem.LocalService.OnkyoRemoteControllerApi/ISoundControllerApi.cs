@@ -1,9 +1,11 @@
-﻿namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
+﻿using System.Threading.Tasks;
+
+namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
 {
     public interface ISoundControllerApi
     {
         void StartSoundApi(string onkyoUrl);
-        void MasterVolumeUp();
+        Task MasterVolumeUp();
         void MasterVolumeDown();
         void PowerOn();
         void PowerOff();
