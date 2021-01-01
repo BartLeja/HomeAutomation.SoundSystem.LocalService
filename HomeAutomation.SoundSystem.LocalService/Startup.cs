@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using HomeAutomation.SoundSystem.LocalService.Clients;
 using HomeAutomation.SoundSystem.LocalService.Extensions;
+using HomeAutomation.Core.Logger;
 
 namespace HomeAutomation.SoundSystem.LocalService
 {
@@ -31,6 +32,7 @@ namespace HomeAutomation.SoundSystem.LocalService
             services.AddSingleton<ISocketService, SocketService>();
             services.AddSingleton<ISoundControllerApi, OnkyoApi.OnkyoApi>();
             services.AddSingleton<ISignalRClient, SignalRClient>();
+            services.AddHomeAutomationLoggers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

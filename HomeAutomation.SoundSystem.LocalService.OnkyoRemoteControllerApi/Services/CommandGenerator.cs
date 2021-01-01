@@ -22,6 +22,7 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
     {
         public static MasterVolumeCommand MasterVolumeCommandGenerator(MasterVolumeCommandEnum masterVolumeCommandEnum)
         {
+
             string B = "!1MVL";
             return masterVolumeCommandEnum switch
             {

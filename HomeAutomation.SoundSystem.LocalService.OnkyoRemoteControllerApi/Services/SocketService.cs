@@ -1,4 +1,5 @@
-﻿using HomeAutomation.SoundSystem.LocalService.OnkyoApi.Commands;
+﻿using HomeAutomation.Core.Logger;
+using HomeAutomation.SoundSystem.LocalService.OnkyoApi.Commands;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -18,12 +19,18 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
         public  int DevicePort { get; set; }
         private  bool blocked { get; set; }
         public event PacketRecieved OnPacketRecieved;
-       // private IPacketService _packetService;
+        private ITelegramLogger _logger;
+        private ILokiLogger _lokiLogger;
+        // private IPacketService _packetService;
 
         public SocketService(
-           // IPacketService packetService
+             // IPacketService packetService
+             ITelegramLogger logger,
+            ILokiLogger lokiLogger
             )
         {
+            _logger = logger;
+            _lokiLogger = lokiLogger;
          //   _packetService = packetService;
         }
 
@@ -116,13 +123,14 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
                 if (!_sock.Connected)
                     _sock.Connect(DeviceIp, DevicePort);
             }
-            catch (Exception x)
+            catch (Exception ex)
             {
-
+                _lokiLogger.SendMessage($"Sound System {ex}", LogLevel.Error);
+                _logger.SendMessage($"Sound System {ex}", LogLevel.Error);
             }
         }
 
-        private  void blockingListen(string str)
+        private void blockingListen(string str)
         {
             blocked = false;
         }
