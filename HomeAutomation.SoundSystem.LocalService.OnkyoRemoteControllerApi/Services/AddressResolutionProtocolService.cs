@@ -54,13 +54,6 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
         /// <returns></returns>
         public DeviceAddressInfo GetIPInfo(string macAddress)
         {
-            //var ipsInfo = GetIPsInfo();
-            //var ipinfo = (from ip in ipsInfo
-            //              where ip.MacAddress.ToLowerInvariant() == macAddress.ToLowerInvariant()
-            //              select ip).FirstOrDefault();
-
-            //return ipinfo;
-
             return GetIPsInfo()
                 .Where(dai => dai.MacAddress.ToLowerInvariant() == macAddress.ToLowerInvariant())
                 .FirstOrDefault();

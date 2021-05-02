@@ -6,8 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using HomeAutomation.SoundSystem.LocalService.Clients;
-using HomeAutomation.SoundSystem.LocalService.Extensions;
 using HomeAutomation.Core.Logger;
+using HomeAutomation.SoundSystem.LocalService.BackgroundServices;
 
 namespace HomeAutomation.SoundSystem.LocalService
 {
@@ -33,14 +33,13 @@ namespace HomeAutomation.SoundSystem.LocalService
             services.AddSingleton<ISoundControllerApi, OnkyoApi.OnkyoApi>();
             services.AddSingleton<ISignalRClient, SignalRClient>();
             services.AddHomeAutomationLoggers();
+            services.AddHostedService<SoundSystemBackgroundService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public async void Configure(
+        public  void Configure(
             IApplicationBuilder app, 
-            IWebHostEnvironment env, 
-            ISignalRClient signalRClient,
-            ISoundControllerApi soundControllerApi
+            IWebHostEnvironment env
             )
         {
             if (env.IsDevelopment())
@@ -58,10 +57,6 @@ namespace HomeAutomation.SoundSystem.LocalService
             {
                 endpoints.MapControllers();
             });
-
-            await app.RunSignalRClientAsync(_configuration, signalRClient);
-
-            await app.RunSoundSystemAsync(soundControllerApi, _configuration);
         }
     }
 }
