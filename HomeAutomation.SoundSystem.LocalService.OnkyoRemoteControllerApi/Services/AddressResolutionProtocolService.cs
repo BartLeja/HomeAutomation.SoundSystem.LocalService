@@ -1,9 +1,15 @@
-﻿using HomeAutomation.SoundSystem.LocalService.OnkyoApi.Models;
+﻿using ArpLookup;
+using HomeAutomation.SoundSystem.LocalService.OnkyoApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
 {
@@ -12,40 +18,28 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
     /// </summary>
     public class AddressResolutionProtocolService : IAddressResolutionProtocolService
     {
-        //private string _hostName = string.Empty;
-        //private DeviceAddressInfo _deviceAddressInfo;
-
-        public AddressResolutionProtocolService(
-           // string macAddress, string ipAddress
-           )
-        {
-            //MacAddress = macAddress;
-            //IPAddress = ipAddress;
-           // _deviceAddressInfo = deviceAddressInfo;
-        }
-
         public string MacAddress { get; private set; }
         public string IPAddress { get; private set; }
 
-        //public string HostName
-        //{
-        //    get
-        //    {
-        //        if (string.IsNullOrEmpty(_hostName))
-        //        {
-        //            try
-        //            {
-        //                // Retrieve the "Host Name" for this IP Address. This is the "Name" of the machine.
-        //                _hostName = Dns.GetHostEntry(IPAddress).HostName;
-        //            }
-        //            catch
-        //            {
-        //                _hostName = string.Empty;
-        //            }
-        //        }
-        //        return _hostName;
-        //    }
-        //}
+        public async Task<DeviceAddressInfo> GetIPInfo(string macAddress, IEnumerable<string> ips)
+        {
+            foreach (var ip in ips)
+            {
+                try
+                {
+                    PhysicalAddress mac = await Arp.LookupAsync(System.Net.IPAddress.Parse(ip));
+                    if (mac.ToString() == macAddress)
+                       return new DeviceAddressInfo(macAddress, ip);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+
+            }
+            return null;
+        }
+
 
         /// <summary>
         /// Retrieves the IPInfo for the machine on the local network with the specified MAC Address.
@@ -59,34 +53,44 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
                 .FirstOrDefault();
         }
 
+
         /// <summary>
         /// Retrieves the IPInfo for All machines on the local network.
         /// </summary>
         /// <returns></returns>
         private List<DeviceAddressInfo> GetIPsInfo()
         {
-            try
-            {
+             try
+             {
+                //  var tewst = TryGetMacAddressOnLinux("");
                 // Return list of IPInfo objects containing MAC / IP Address combinations
-                return (from arp in GetARPResult().Split(new[] { '\n', '\r' })
-                        where !string.IsNullOrEmpty(arp)
-                        select (from piece in arp.Split(new[] { ' ', '\t' })
-                                where !string.IsNullOrEmpty(piece)
-                                select piece).ToArray()
-                          into pieces
-                        where pieces.Length == 3
-                        select new DeviceAddressInfo(pieces[1].Replace("-", string.Empty), pieces[0])).ToList();
+                return GetARPResult()
+                    .Split(new[] { '\n', '\r' })
+                    .Where(arp => 
+                        !string.IsNullOrEmpty(arp) && 
+                        GetIPRegex(arp) !=null && 
+                        GetMacAddressRegex(arp) !=null)
+                    .Select(dai => new DeviceAddressInfo(
+                        GetMacAddressRegex(dai).Replace("-", string.Empty).Replace(":", string.Empty), 
+                        GetIPRegex(dai)))
+                    .ToList();
+                //var kkk = (from arp in GetARPResult().Split(new[] { '\n', '\r' })
+                //         where !string.IsNullOrEmpty(arp)
+                //         select (from piece in arp.Split(new[] { ' ', '\t' })
+                //                    where !string.IsNullOrEmpty(piece)
+                //                    select piece).ToArray()
+                //              into pieces
+                //            where pieces.Length == 3
+                //            select new DeviceAddressInfo(pieces[1].Replace("-", string.Empty), pieces[0])).ToList();
 
-                //return GetARPResult().Split(new[] { '\n', '\r' })
-                //    .Where(arp=> !string.IsNullOrEmpty(arp))
-                //    .Select(arp => arp.Split(new[] { ' ', '\t' })
-                //            .Select(piece => piece.Where(p=> !string.IsNullOrEmpty(p)))
             }
-            catch (Exception ex)
-            {
+             catch (Exception ex)
+             {
                 throw new Exception("IPInfo: Error Parsing 'arp -a' results", ex);
-            }
+             }
+           
         }
+
 
         /// <summary>
         /// This runs the "arp" utility in Windows to retrieve all the MAC / IP Address entries.
@@ -97,32 +101,61 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
             Process p = null;
             string output;
 
-            try
-            {
-                p = Process.Start(new ProcessStartInfo("arp", "-a")
-                {
-                    CreateNoWindow = true,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true
-                });
-
-                output = p.StandardOutput.ReadToEnd();
-
-                p.Close();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("IPInfo: Error Retrieving 'arp -a' Results", ex);
-            }
-            finally
-            {
-                if (p != null)
-                {
-                    p.Close();
+           try
+           {
+               if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+               {
+                    p = Process.Start(new ProcessStartInfo("arp", "-a")
+                    {
+                         CreateNoWindow = true,
+                         UseShellExecute = false,
+                         RedirectStandardOutput = true
+                    });
+               }
+               else
+               {
+                    Console.WriteLine("linux arp");
+                    p = Process.Start(new ProcessStartInfo("/bin/bash", "arp -a")
+                    {
+                        CreateNoWindow = true,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true
+                    });
                 }
-            }
+                   
+               output = p.StandardOutput.ReadToEnd();
+                Console.WriteLine(output);
+                p.Close();
+           }
+           catch (Exception ex)
+           {
+              throw new Exception("IPInfo: Error Retrieving 'arp -a' Results", ex);
+           }
+           finally
+           {
+               if (p != null)
+                 p.Close();
+           }
 
-            return output;
+           return output;
+        }
+
+        private string GetIPRegex(string line)
+        {
+            string pattern = @"\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b";
+            return GetValueByRegex(line, pattern);
+        }
+
+        private string GetMacAddressRegex(string line)
+        {
+            var pattern = @"[0-9a-f]{2}[:-][0-9a-f]{2}[:-][0-9a-f]{2}[:-][0-9a-f]{2}[:-][0-9a-f]{2}[:-][0-9a-f]{2}";
+            return GetValueByRegex(line,pattern);
+        }
+
+        private string GetValueByRegex(string line, string pattern)
+        {
+            var result = Regex.Matches(line, pattern, RegexOptions.IgnoreCase);
+            return result.Count > 0 ? result.FirstOrDefault().Value : null;
         }
     }
 }

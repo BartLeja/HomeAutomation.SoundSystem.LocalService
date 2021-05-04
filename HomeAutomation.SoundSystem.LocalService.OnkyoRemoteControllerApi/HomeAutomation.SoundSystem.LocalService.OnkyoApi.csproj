@@ -9,6 +9,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ArpLookup" Version="1.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\HomeAutomation.Core\HomeAutomation.Core.csproj" />
   </ItemGroup>
 

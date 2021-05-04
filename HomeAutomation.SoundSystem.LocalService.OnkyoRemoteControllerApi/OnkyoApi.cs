@@ -31,9 +31,9 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
             _packetService = packetService;
         }
 
-        public void StartSoundApi(string onkyoUrl)
+        public async Task StartSoundApi(string onkyoUrl)
         {
-            connect(onkyoUrl);
+           await Connect(onkyoUrl);
         }
 
         public async Task MasterVolumeUp() => _socketService.SendPacket(CommandGenerator.MasterVolumeCommandGenerator(MasterVolumeCommandEnum.Up));
@@ -50,12 +50,12 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
         public void PowerOff()
             => _socketService.SendPacket(CommandGenerator.PowerCommandGenerator(PowerCommandEnum.Standby));
 
-        private bool connect(string onkyoUrl)
+        private async Task Connect(string onkyoUrl)
         {
             //Auto-discovery, or get IP by input
             Console.WriteLine("Finding reciever...");
             //var discovery = ISCPDeviceDiscovery.DiscoverDevice("172.16.40.255", 60128);
-            var discovery = _deviceDiscoveryService.DiscoverDevice(60128);
+            var discovery = await _deviceDiscoveryService.DiscoverDevice(60128);
             string deviceip = discovery.IP;
             if (string.IsNullOrEmpty(deviceip))
             {
@@ -102,10 +102,10 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi
             catch (Exception x)
             {
                 Console.WriteLine("Error connecting (" + x.Message + ")");
-                return false;
+                //return false;
             }
 
-            return true;
+          //  return true;
         }
 
         private void ISCPSocket_OnPacketRecieved(string str)

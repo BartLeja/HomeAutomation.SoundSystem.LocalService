@@ -120,7 +120,7 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
             {
                 if (_sock == null)
                     _sock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp) { ReceiveTimeout = 1000 };
-                if (!_sock.Connected)
+                if (!_sock.Connected && DeviceIp != null)
                     _sock.Connect(DeviceIp, DevicePort);
             }
             catch (Exception ex)

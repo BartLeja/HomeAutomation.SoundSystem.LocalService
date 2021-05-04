@@ -6,6 +6,7 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
 {
@@ -26,7 +27,7 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
             _packetService = packetService;
         }
 
-        public DiscoveryResult DiscoverDevice(int port)
+        public async Task<DiscoveryResult> DiscoverDevice(int port)
         {
             IEnumerable<string> ips = getInterfaceAddresses();
             var ret = new DiscoveryResult();
@@ -40,15 +41,21 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
             {
                 try
                 {
-                    _client.SendAsync(sendbuf, sendbuf.Length, IPAddress.Parse(networkaddress).ToString(), port);
-                     _client.SendAsync(sendbuf, sendbuf.Length, IPAddress.Parse(networkaddress).ToString(), port);
-                     _client.SendAsync(sendbuf, sendbuf.Length, IPAddress.Parse(networkaddress).ToString(), port);
+                  
+                    _client.Send(sendbuf, sendbuf.Length, IPAddress.Parse(networkaddress).ToString(), port);
+                    Console.WriteLine("Dobry socket");
+                    //   _client.SendAsync(sendbuf, sendbuf.Length, IPAddress.Parse(networkaddress).ToString(), port);
+                    // _client.SendAsync(sendbuf, sendbuf.Length, IPAddress.Parse(networkaddress).ToString(), port);
                 }
                 catch (Exception e)
                 {
-
+                    Console.WriteLine("Zly socket");
                     Console.WriteLine(e);
                 }
+                //finally
+                //{
+                //    _client.Close();
+                //}
 
             }
             while (_client.Available > 0)
@@ -59,13 +66,15 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
                 foreach (byte t in recv)
                     sb.Append(char.ConvertFromUtf32(Convert.ToInt32(string.Format("{0:x2}", t), 16)));
                 string stringData = sb.ToString();
+               
+                
                 if (stringData.Contains("!1ECN"))
                 {
                     int idx = stringData.IndexOf("!1ECN") + 5;
                     string[] parts = stringData.Substring(idx).Split('/');
                     string mac = parts[3].Substring(0, 12);
-                    string ip = _addressResolutionProtocolService.GetIPInfo(mac).IpAddress;
-                    ret.IP = ip;
+                    var ip = _addressResolutionProtocolService.GetIPInfo(mac);
+                    ret.IP = ip.IpAddress;
                     ret.Port = Convert.ToInt32(parts[1]);
                     ret.Region = stringData.Substring(idx + 14, 2);
                     ret.MAC = mac;
@@ -86,7 +95,9 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
         {
             NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
 
-            return (from nic in nics
+            var testtest = nics[0].GetIPProperties();
+
+            var test = (from nic in nics
                     select nic.GetIPProperties()
                       into ipProps
                     from addr in ipProps.UnicastAddresses.Where(addr => addr.Address.AddressFamily == AddressFamily.InterNetwork)
@@ -94,6 +105,8 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
                         into network
                     where network != null
                     select network.ToString()).ToList();
+
+            return test;
         }
 
         public static IPAddress GetBroadcastAddress(IPAddress address, IPAddress subnetMask)

@@ -35,7 +35,7 @@ namespace HomeAutomation.SoundSystem.LocalService.BackgroundServices
             //var token = await restClient.GetToken();
             await _signalRClient.ConnectToSignalR("test", signalRHubUrl);
             var onkyoUrl = _configuration.GetSection("OnkyoUrl").Value;
-            _soundControllerApi.StartSoundApi(onkyoUrl);
+            await _soundControllerApi.StartSoundApi(onkyoUrl);
         }
     }
 }
