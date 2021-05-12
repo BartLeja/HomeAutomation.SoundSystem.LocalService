@@ -14,6 +14,7 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
     {
         /* "!xECNQSTN" */
         private static UdpClient _client;
+        private Socket _sock;
         private static IPEndPoint _localEndPoint;
         private IAddressResolutionProtocolService _addressResolutionProtocolService;
         private IPacketService _packetService;
@@ -31,36 +32,31 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
         {
             IEnumerable<string> ips = getInterfaceAddresses();
             var ret = new DiscoveryResult();
-            _localEndPoint = new IPEndPoint(IPAddress.Any, 0);
+            _localEndPoint = new IPEndPoint(IPAddress.Any, 22222);
+          
             _client = new UdpClient(port);
-            
-            //var p = new ISCPPacket("!xECNQSTN");
+            _client.EnableBroadcast = true;
             _packetService.SetCommand("!xECNQSTN");
             byte[] sendbuf = _packetService.GetBytes();
             foreach (string networkaddress in ips)
             {
                 try
                 {
-                  
                     _client.Send(sendbuf, sendbuf.Length, IPAddress.Parse(networkaddress).ToString(), port);
                     Console.WriteLine("Dobry socket");
-                    //   _client.SendAsync(sendbuf, sendbuf.Length, IPAddress.Parse(networkaddress).ToString(), port);
-                    // _client.SendAsync(sendbuf, sendbuf.Length, IPAddress.Parse(networkaddress).ToString(), port);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("Zly socket");
                     Console.WriteLine(e);
                 }
-                //finally
-                //{
-                //    _client.Close();
-                //}
-
             }
+            //while (_client.Available > 0)
             while (_client.Available > 0)
             {
-                byte[] recv = _client.Receive(ref _localEndPoint);
+              //  var recv = new byte[256];
+               // _sock.Receive(recv, recv.Length, SocketFlags.None);
+                 byte[] recv = _client.Receive(ref _localEndPoint);
                 Thread.Sleep(300);
                 var sb = new StringBuilder();
                 foreach (byte t in recv)
@@ -81,6 +77,7 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
                     ret.Model = stringData.Substring(idx, 7);
                 }
             }
+          //  _sock.Close();
             _client.Close();
             return ret;
         }

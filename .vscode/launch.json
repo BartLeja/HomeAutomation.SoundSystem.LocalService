@@ -48,7 +48,7 @@
             },
             "pipeTransport": {
                 "pipeCwd": "${workspaceFolder}",
-                "pipeProgram": "E:\\Programs\\PuTTY\\plink.exe",
+                "pipeProgram": "C:\\Program Files\\PuTTY\\plink.exe",
                 "pipeArgs": [
                     "-pw",
                     "Sim13vetson!",

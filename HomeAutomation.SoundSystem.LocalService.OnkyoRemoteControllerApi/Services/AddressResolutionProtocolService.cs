@@ -74,15 +74,7 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
                         GetMacAddressRegex(dai).Replace("-", string.Empty).Replace(":", string.Empty), 
                         GetIPRegex(dai)))
                     .ToList();
-                //var kkk = (from arp in GetARPResult().Split(new[] { '\n', '\r' })
-                //         where !string.IsNullOrEmpty(arp)
-                //         select (from piece in arp.Split(new[] { ' ', '\t' })
-                //                    where !string.IsNullOrEmpty(piece)
-                //                    select piece).ToArray()
-                //              into pieces
-                //            where pieces.Length == 3
-                //            select new DeviceAddressInfo(pieces[1].Replace("-", string.Empty), pieces[0])).ToList();
-
+                
             }
              catch (Exception ex)
              {
@@ -114,13 +106,24 @@ namespace HomeAutomation.SoundSystem.LocalService.OnkyoApi.Services
                }
                else
                {
+                  
                     Console.WriteLine("linux arp");
-                    p = Process.Start(new ProcessStartInfo("/bin/bash", "arp -a")
+
+                    try
                     {
-                        CreateNoWindow = true,
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true
-                    });
+                        p = Process.Start(new ProcessStartInfo("/bin/bash", "-c /usr/sbin/arp -?")
+                        {
+                            CreateNoWindow = true,
+                            UseShellExecute = false,
+                            RedirectStandardOutput = true
+                        });
+                    }
+                    catch (Exception e)
+                    {
+
+                        Console.WriteLine(e);
+                    }
+                   
                 }
                    
                output = p.StandardOutput.ReadToEnd();
